@@ -55,32 +55,43 @@ public class Simulatore {
 	public void run() {
 		
 		while(!queue.isEmpty()) {
-			Evento evento = queue.poll();
 			
-			System.out.println(evento);
+			Evento evento = queue.poll();
 			
 			switch (evento.getTipo()) {
 			
 			case GRUPPO_CLIENTI_ARRIVA:
 				boolean postoTrovato = false;
 				int dimensioneGruppo = evento.getGruppo().getNumeroPersone();
-				int postiTavoloMin= Integer.MAX_VALUE;
+				int postiTavoloMin = Integer.MAX_VALUE;
+				
 				for(int postiTavolo : mappaTavoli.keySet()) {
 					if(postiTavolo>=dimensioneGruppo && postiTavolo<=(dimensioneGruppo*2) && postiTavoloMin>postiTavolo) {
 						postiTavoloMin = postiTavolo;
-						if(mappaTavoli.get(postiTavolo).getNumeroTavoliDisponibili()>0) {
-							mappaTavoli.get(postiTavolo).setNumeroTavoliDisponibili(mappaTavoli.get(postiTavolo).getNumeroTavoliDisponibili()-1);
-							evento.setTavolo(mappaTavoli.get(postiTavolo));
-							evento.getGruppo().setTavoloAssegnato(mappaTavoli.get(postiTavolo));
-							numeroClientiTotali += dimensioneGruppo;
-							numeroClientiSoddisfatti += dimensioneGruppo;
-							postoTrovato = true;
-							Evento e = new Evento(evento.getIstante()+evento.getGruppo().getPermanenza(), TipoEvento.GRUPPO_CLIENTI_ABBANDONA, evento.getGruppo());
-							e.setTavolo(mappaTavoli.get(postiTavolo));
-							queue.add(e);
-						}
 					}
 				}
+				
+				if(mappaTavoli.containsKey(postiTavoloMin)) {
+					if(mappaTavoli.get(postiTavoloMin).getNumeroTavoliDisponibili()>0) {
+						postoTrovato = true;
+						
+						//aggiorno dati evento e gruppo
+						evento.setTavolo(mappaTavoli.get(postiTavoloMin));
+						evento.getGruppo().setTavoloAssegnato(mappaTavoli.get(postiTavoloMin));
+						evento.getTavolo().decrementaTavoli();
+						
+						//aggiorno statistiche
+						numeroClientiTotali += dimensioneGruppo;
+						numeroClientiSoddisfatti += dimensioneGruppo;
+						
+						//creo evento abbandono tavolo e lo aggiungo alla coda
+						Evento eventoAbbandono = new Evento(evento.getIstante()+evento.getGruppo().getPermanenza(), TipoEvento.GRUPPO_CLIENTI_ABBANDONA, evento.getGruppo());
+						eventoAbbandono.setTavolo(mappaTavoli.get(postiTavoloMin));
+						queue.add(eventoAbbandono);
+					
+					}
+				}
+				
 				if(postoTrovato == false) {
 					
 					if(Math.random() >= 1 - evento.getGruppo().getTolleranza()) {
@@ -91,24 +102,21 @@ public class Simulatore {
 						numeroClientiInsoddisfatti += dimensioneGruppo;
 						numeroClientiTotali += dimensioneGruppo;
 					}
-				
-				break;
 				}
 				
-			case GRUPPO_CLIENTI_ABBANDONA:
-				evento.getTavolo().setNumeroTavoliDisponibili(evento.getTavolo().getNumeroTavoliDisponibili()+1);
 				break;
 				
+			case GRUPPO_CLIENTI_ABBANDONA:
+				evento.getTavolo().incrementaTavoli();
+				break;
 		
 			}
 		}
-		
 	}
 
 	@Override
 	public String toString() {
-		return "Simulatore [numeroClientiSoddisfatti=" + numeroClientiSoddisfatti + ", numeroClientiInsoddisfatti="
-				+ numeroClientiInsoddisfatti + ", numeroClientiTotali=" + numeroClientiTotali + "]";
+		return "Numero clienti soddisfatti: "+numeroClientiSoddisfatti+"\nNumero clienti insoddisfatti: "+numeroClientiInsoddisfatti+"\nNumero clienti totali: "+numeroClientiTotali;
 	}
 	
 }

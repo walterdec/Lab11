@@ -3,34 +3,34 @@ package it.polito.tdp.bar.model;
 public class Tavolo {
 	
 	private int numeroPostiDisponibili;
-	private int numeroPostiOccupati;
 	private int numeroTavoliDisponibili;
 	
 	public Tavolo(int numeroPostiDisponibili, int numeroTavoliDisponibili) {
 		this.numeroPostiDisponibili = numeroPostiDisponibili;
 		this.numeroTavoliDisponibili = numeroTavoliDisponibili;
-		numeroPostiOccupati = 0;
-	}
-
-	public int getNumeroPostiOccupati() {
-		return numeroPostiOccupati;
-	}
-
-	public void setNumeroPostiOccupati(int numeroPostiOccupati) {
-		this.numeroPostiOccupati = numeroPostiOccupati;
 	}
 
 	public int getNumeroPostiDisponibili() {
-		return numeroPostiDisponibili;
+		return this.numeroPostiDisponibili;
 	}
 	
 	public int getNumeroTavoliDisponibili() {
-		return numeroTavoliDisponibili;
+		return this.numeroTavoliDisponibili;
 	}
 	
-	public void setNumeroTavoliDisponibili(int num) {
-		this.numeroTavoliDisponibili = num;
+	public void incrementaTavoli(){
+		this.numeroTavoliDisponibili++;
 	}
+	public void decrementaTavoli(){
+		this.numeroTavoliDisponibili--;
+	}
+
+	@Override
+	public String toString() {
+		return "Tavolo [numeroPostiDisponibili=" + numeroPostiDisponibili + ", numeroTavoliDisponibili="
+				+ numeroTavoliDisponibili + "]";
+	}
+
 	
 	
 

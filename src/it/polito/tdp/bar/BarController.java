@@ -27,9 +27,10 @@ public class BarController {
 
     @FXML
     void doSimula(ActionEvent event) {
+    	txtArea.clear();
     	simulatore.init();
     	simulatore.run();
-    	txtArea.appendText(simulatore.toString()+"\n");
+    	txtArea.appendText(simulatore.toString());
     }
 
     @FXML
